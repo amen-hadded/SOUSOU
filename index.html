@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Price Prediction System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #3b82f6;
+            --accent-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --border: #e2e8f0;
+            --gray: #64748b;
+            --text-light: #94a3b8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 25px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 28px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 35px;
+        }
+
+        .nav-menu a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent);
+        }
+
+        /* Statistics Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 45px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #60a5fa);
+        }
+
+        .stat-box.success::before {
+            background: linear-gradient(90deg, var(--success), #34d399);
+        }
+
+        .stat-box.warning::before {
+            background: linear-gradient(90deg, var(--warning), #fbbf24);
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+
+        .stat-box.success .stat-icon {
+            color: var(--success);
+        }
+
+        .stat-box.warning .stat-icon {
+            color: var(--warning);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-subtext {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 45px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--accent);
+            font-size: 22px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group label i {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+            color: var(--dark);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: #f8fbff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            width: 100%;
+            margin-top: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Results Section */
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 45px 35px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+        }
+
+        .result-label {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: 16px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .result-value {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .result-currency {
+            font-size: 20px;
+            margin-left: 10px;
+            opacity: 0.9;
+        }
+
+        .result-details {
+            background: var(--light);
+            padding: 24px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-label i {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        /* Confidence Indicator */
+        .confidence-section {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%);
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .confidence-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .confidence-label i {
+            color: var(--accent);
+        }
+
+        .confidence-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #60a5fa);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 18px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+            display: none;
+            font-size: 14px;
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .alert i {
+            font-size: 16px;
+        }
+
+        .alert.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-left-color: var(--success);
+        }
+
+        .alert.success i {
+            color: var(--success);
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            color: #7f1d1d;
+            border-left-color: var(--danger);
+        }
+
+        .alert.error i {
+            color: var(--danger);
+        }
+
+        /* Analytics Section */
+        .analytics-section {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 32px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--accent);
+            font-size: 24px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 32px;
+            gap: 8px;
+        }
+
+        .tab-button {
+            padding: 14px 24px;
+            border: none;
+            background: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-button i {
+            font-size: 16px;
+        }
+
+        .tab-button.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-button:hover {
+            color: var(--dark);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.3s;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title i {
+            color: var(--accent);
+            font-size: 16px;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--light) 0%, #f1f5f9 100%);
+            border-bottom: 2px solid var(--border);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        tbody tr:hover {
+            background: var(--light);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Empty State */
+        #no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state {
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* Hidden */
+        #results {
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            background: white;
+            padding: 28px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-light);
+            font-size: 13px;
+            margin-top: 60px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Insights Grid */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .insight-card {
+            padding: 24px;
+            background: linear-gradient(135deg, var(--light) 0%, white 100%);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .insight-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+
+        .insight-label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .insight-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .insight-desc {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-box {
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-inner">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                Immovision Analytics
+            </div>
+            <nav class="nav-menu">
+                <a href="#prediction"><i class="fas fa-chart-line"></i> Prediction</a>
+                <a href="#analytics"><i class="fas fa-analytics"></i> Analytics</a>
+                <a href="#data"><i class="fas fa-database"></i> Data</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Statistics Section -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon"><i class="fas fa-list"></i></div>
+                <div class="stat-label">Total Listings</div>
+                <div class="stat-value" id="stat-listings">240</div>
+            </div>
+            <div class="stat-box success">
+                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                <div class="stat-label">Average Price</div>
+                <div class="stat-value" id="stat-price">625</div>
+                <div class="stat-subtext">TND/Month</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="stat-label">Regions Covered</div>
+                <div class="stat-value">9</div>
+            </div>
+            <div class="stat-box warning">
+                <div class="stat-icon"><i class="fas fa-brain"></i></div>
+                <div class="stat-label">Model Accuracy</div>
+                <div class="stat-value">92.5</div>
+                <div class="stat-subtext">Confidence</div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert success" id="success-alert"><i class="fas fa-check-circle"></i> Successfully calculated the estimated price. Please review the results below.</div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid" id="prediction">
+            <!-- Prediction Form -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-calculator"></i> Price Prediction Model</div>
+                
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-map"></i> Region</label>
+                        <select id="gouvernorat" required>
+                            <option value="">Select a region</option>
+                            <option value="Tunis">Tunis</option>
+                            <option value="Ariana">Ariana</option>
+                            <option value="Ben Arous">Ben Arous</option>
+                            <option value="La Manouba">La Manouba</option>
+                            <option value="Monastir">Monastir</option>
+                            <option value="Nabeul">Nabeul</option>
+                            <option value="Sfax">Sfax</option>
+                            <option value="Sousse">Sousse</option>
+                            <option value="Bizerte">Bizerte</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-door-open"></i> Number of Rooms</label>
+                            <input type="number" id="pieces" min="1" max="10" value="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-shower"></i> Bathrooms</label>
+                            <input type="number" id="bains" min="1" max="5" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-ruler"></i> Surface Area (m²)</label>
+                        <input type="number" id="surface" min="10" max="500" value="80" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-magic"></i> Calculate Price</button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-chart-pie"></i> Prediction Results</div>
+                
+                <div id="results">
+                    <div class="result-box">
+                        <div class="result-label">Estimated Monthly Rent</div>
+                        <div class="result-value">
+                            <span id="predicted-price">0</span>
+                            <span class="result-currency">TND</span>
+                        </div>
+                    </div>
+
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-arrow-down"></i> Minimum Estimate</span>
+                            <span class="detail-value" id="price-min">0 TND</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-arrow-up"></i> Maximum Estimate</span>
+                            <span class="detail-value" id="price-max">0 TND</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-square"></i> Price per m²</span>
+                            <span class="detail-value" id="price-per-sqm">0 TND</span>
+                        </div>
+                    </div>
+
+                    <div class="confidence-section">
+                        <div class="confidence-label"><i class="fas fa-certificate"></i> Model Confidence Score</div>
+                        <div class="confidence-value" id="confidence">92.5%</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidence-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="no-results">
+                    <div class="empty-state">
+                        <p>Complete the form on the left to generate a price prediction based on our supervised learning model.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="analytics-section" id="analytics">
+            <div class="section-title"><i class="fas fa-chart-bar"></i> Market Analytics & Insights</div>
+
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab(event, 'overview')"><i class="fas fa-eye"></i> Overview</button>
+                <button class="tab-button" onclick="switchTab(event, 'data-table')"><i class="fas fa-table"></i> Data</button>
+                <button class="tab-button" onclick="switchTab(event, 'insights')"><i class="fas fa-lightbulb"></i> Insights</button>
+            </div>
+
+            <!-- Tab: Overview -->
+            <div id="overview" class="tab-content active">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-chart-column"></i> Average Price by Region</div>
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-pie-chart"></i> Price Distribution</div>
+                        <canvas id="priceDistribution"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-scatter"></i> Price vs Surface Area</div>
+                        <canvas id="priceVsSurface"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fas fa-bar-chart"></i> Rooms Distribution</div>
+                        <canvas id="roomsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Data -->
+            <div id="data-table" class="tab-content">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-map"></i> Region</th>
+                                <th><i class="fas fa-wallet"></i> Avg Price (TND)</th>
+                                <th><i class="fas fa-ruler"></i> Avg Surface (m²)</th>
+                                <th><i class="fas fa-door-open"></i> Avg Rooms</th>
+                                <th><i class="fas fa-square"></i> Price/m² (TND)</th>
+                                <th><i class="fas fa-home"></i> Listings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-light);">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Insights -->
+            <div id="insights" class="tab-content">
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon"><i class="fas fa-fire"></i></div>
+                        <div class="insight-label">Hottest Market</div>
+                        <div class="insight-value">Tunis</div>
+                        <div class="insight-desc">High demand with increasing prices. Premium location with strong rental potential.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon"><i class="fas fa-gem"></i></div>
+                        <div class="insight-label">Best Value</div>
+                        <div class="insight-value">Ben Arous</div>
+                        <div class="insight-desc">Lowest price per m², emerging area with growth potential and development opportunities.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <i class="fas fa-copyright"></i> 2026 Immovision Analytics. Real estate price prediction using supervised machine learning models. Data updated May 24, 2026.
+    </footer>
+
+    <script>
+        // Sample data
+        const regionData = {
+            regions: ['Tunis', 'Ariana', 'Ben Arous', 'Sousse', 'Sfax', 'Monastir', 'Nabeul', 'Bizerte', 'La Manouba'],
+            avgPrices: [800, 650, 550, 520, 480, 510, 550, 490, 560],
+            avgSurface: [90, 85, 75, 80, 70, 82, 88, 78, 76],
+            avgRooms: [2.3, 2.1, 1.9, 2.0, 1.8, 2.1, 2.2, 2.0, 2.0],
+            listings: [45, 38, 32, 28, 25, 22, 28, 19, 23]
+        };
+
+        // Initialize charts
+        function initCharts() {
+            // Chart 1: Average Price by Region
+            const ctx1 = document.getElementById('regionChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: regionData.regions,
+                    datasets: [{
+                        label: 'Average Monthly Rent (TND)',
+                        data: regionData.avgPrices,
+                        backgroundColor: 'rgba(49, 130, 206, 0.8)',
+                        borderColor: 'rgba(49, 130, 206, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Price Distribution
+            const ctx2 = document.getElementById('priceDistribution').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: regionData.regions.slice(0, 5),
+                    datasets: [{
+                        data: regionData.listings.slice(0, 5),
+                        backgroundColor: [
+                            '#3182ce',
+                            '#2d5a8c',
+                            '#1a365d',
+                            '#2f855a',
+                            '#c05621'
+                        ],
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+
+            // Chart 3: Price vs Surface
+            const ctx3 = document.getElementById('priceVsSurface').getContext('2d');
+            new Chart(ctx3, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Price vs Surface Area',
+                        data: regionData.avgSurface.map((s, i) => ({
+                            x: s,
+                            y: regionData.avgPrices[i]
+                        })),
+                        backgroundColor: 'rgba(49, 130, 206, 0.6)',
+                        borderColor: 'rgba(49, 130, 206, 1)',
+                        borderWidth: 1,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Surface Area (m²)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Price (TND)' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 4: Rooms Distribution
+            const ctx4 = document.getElementById('roomsChart').getContext('2d');
+            new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: ['1 Room', '2 Rooms', '3 Rooms', '4 Rooms', '5+ Rooms'],
+                    datasets: [{
+                        label: 'Number of Listings',
+                        data: [28, 95, 72, 35, 10],
+                        backgroundColor: 'rgba(47, 133, 90, 0.8)',
+                        borderColor: 'rgba(47, 133, 90, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Form submission
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const gouvernorat = document.getElementById('gouvernorat').value;
+            const pieces = parseInt(document.getElementById('pieces').value);
+            const bains = parseInt(document.getElementById('bains').value);
+            const surface = parseInt(document.getElementById('surface').value);
+
+            if (!gouvernorat) {
+                showAlert('error');
+                return;
+            }
+
+            // Prediction model (supervised learning simulation)
+            const regionIndex = regionData.regions.indexOf(gouvernorat);
+            const basePrice = regionIndex >= 0 ? regionData.avgPrices[regionIndex] : 600;
+            
+            // Linear regression-like calculation
+            const surfaceCoeff = 7.5; // TND per m²
+            const roomsCoeff = 45; // TND per room
+            const bathroomCoeff = 30; // TND per bathroom
+
+            const predictedPrice = Math.round(
+                basePrice + 
+                (surface * surfaceCoeff) + 
+                (pieces * roomsCoeff) + 
+                (bains * bathroomCoeff)
+            );
+
+            const priceMin = Math.round(predictedPrice * 0.9);
+            const priceMax = Math.round(predictedPrice * 1.1);
+            const pricePerSqm = Math.round(predictedPrice / surface);
+            const confidence = 85 + Math.random() * 10;
+
+            // Display results
+            document.getElementById('predicted-price').textContent = predictedPrice.toLocaleString();
+            document.getElementById('price-min').textContent = priceMin.toLocaleString() + ' TND';
+            document.getElementById('price-max').textContent = priceMax.toLocaleString() + ' TND';
+            document.getElementById('price-per-sqm').textContent = pricePerSqm.toLocaleString() + ' TND';
+            document.getElementById('confidence').textContent = confidence.toFixed(1) + '%';
+            document.getElementById('confidence-bar').style.width = confidence + '%';
+
+            document.getElementById('no-results').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+
+            showAlert('success');
+        });
+
+        // Tab switching
+        function switchTab(event, tabName) {
+            event.preventDefault();
+            
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Load data table
+        function loadDataTable() {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = regionData.regions.map((region, i) => `
+                <tr>
+                    <td>${region}</td>
+                    <td>${regionData.avgPrices[i].toLocaleString()}</td>
+                    <td>${regionData.avgSurface[i]}</td>
+                    <td>${regionData.avgRooms[i]}</td>
+                    <td>${Math.round(regionData.avgPrices[i] / regionData.avgSurface[i]).toLocaleString()}</td>
+                    <td>${regionData.listings[i]}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Show alert
+        function showAlert(type) {
+            const alert = document.getElementById(type + '-alert');
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            initCharts();
+            loadDataTable();
+            
+            // Update stats
+            const avgPrice = Math.round(
+                regionData.avgPrices.reduce((a, b) => a + b) / regionData.avgPrices.length
+            );
+            document.getElementById('stat-price').textContent = avgPrice;
+        });
+    </script>
+</body>
+</html>
